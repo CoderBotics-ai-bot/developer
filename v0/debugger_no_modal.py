@@ -3,6 +3,8 @@ import os
 from time import sleep
 from constants import DEFAULT_DIR, DEFAULT_MODEL, DEFAULT_MAX_TOKENS, EXTENSION_TO_SKIP
 import argparse
+import openai
+from constants import DEFAULT_MODEL
 def read_file(filename):
     with open(filename, "r") as file:
         return file.read()
@@ -65,8 +67,28 @@ def main(args):
     # print res in teal
     print("\033[96m" + res + "\033[0m")
 
+def generate_response(
+    system_prompt: str, user_prompt: str, model: str = DEFAULT_MODEL, *args
+) -> str:
+    """
+    Generate a response for given system and user prompts.
 
-def generate_response(system_prompt, user_prompt, model=DEFAULT_MODEL, *args):
+    This function uses OpenAI API to generate a response for given system and user prompts. The model passed as
+    an argument is used for generating the response. In case of API failures, the function keeps retrying after
+    a delay until it succeeds.
+
+    Parameters:
+    system_prompt (str): system prompt that needs to be responded.
+    user_prompt (str): user prompt that needs to be responded.
+    model (str, optional): The model which will be used by OpenAI. Defaults to `DEFAULT_MODEL`.
+    *args: Can include additional prompts which will be alternately treated as assistant and user prompts.
+
+    Returns:
+    reply (str): The generated response for given prompts.
+
+    Raises:
+    Exception: If API requests fail continuously.
+    """
     import openai
 
     # Set up your OpenAI API credentials
